@@ -112,8 +112,14 @@ Test kiểm tra:
 
 ## Publish bằng GitHub Pages
 
-1. Lưu trong Setting, rồi commit và push lên GitHub.
-2. Vào `Settings` → `Pages`, chọn source: branch `main`, folder `/ (root)`.
+Project deploy tự động bằng GitHub Actions ([.github/workflows/deploy.yml](.github/workflows/deploy.yml)).
+
+1. **Một lần duy nhất**: trên GitHub, vào `Settings` → `Pages` → `Build and deployment` → `Source`, chọn **GitHub Actions**.
+2. Mỗi lần cập nhật: lưu trong Setting, rồi commit và push lên `main`. Workflow sẽ:
+   - chạy test; nếu 2 file thiệp lệch với `config-setting.js` thì dừng, không deploy;
+   - nếu test pass, deploy cả project lên GitHub Pages.
+
+   Có thể chạy tay ở tab `Actions` → `Deploy Website` → `Run workflow`.
 3. Thiệp sẽ có địa chỉ:
    - `https://<username>.github.io/<repository-name>/` (trang chọn thiệp)
    - `.../Groom/` (thiệp nhà trai)
@@ -128,6 +134,7 @@ GitHub Pages cache file khoảng 10 phút. Muốn khách thấy thay đổi ngay
 | Bấm Lưu nhưng không thấy hộp chọn thư mục | Dùng Chrome/Edge bản mới |
 | Báo "Thư mục chưa đúng" | Chọn thư mục gốc (chứa `index.html`), không chọn thư mục con |
 | Lưu xong nhưng thiệp không đổi | Reload bằng `Ctrl + F5`. Trên GitHub Pages thì đợi vài phút hoặc tăng số `?v=` |
+| Workflow Actions báo lỗi ở bước Test config | Có người sửa tay `config-groom.js` / `config-bride.js`. Mở Setting và bấm Lưu lại rồi push |
 | Ảnh không hiện | Kiểm tra ô ảnh trong Setting có viền đỏ không. Tên file có phân biệt hoa/thường trên GitHub Pages |
 | Nhạc không phát | Trình duyệt chặn tự phát; khách bấm nút ♫. iPhone để chế độ im lặng cũng không phát |
 
