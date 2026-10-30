@@ -37,6 +37,9 @@ const musicEnabled = config.music.enabled !== false && Boolean(config.music.src)
 // Thiệp nhà nào thì nhà đó đứng trước.
 config.events.sort((a, b) => (b.key === side) - (a.key === side));
 
+// Tỉ lệ khung (rộng / cao) theo hướng ảnh chọn trong Setting.
+const ALBUM_RATIOS = { portrait: 2 / 3, landscape: 3 / 2, square: 1 };
+
 function $(id) {
   return document.getElementById(id);
 }
@@ -69,6 +72,11 @@ function escapeHtml(value) {
     '"': "&quot;",
     "'": "&#039;"
   })[char]);
+}
+
+// Ảnh nền đổi qua biến CSS, để trống thì style.css dùng ảnh mặc định.
+function cssImage(name, path) {
+  if (path) document.documentElement.style.setProperty(name, `url("${asset(path)}")`);
 }
 
 function setHidden(id, hidden) {
@@ -156,6 +164,8 @@ function renderConfig() {
   attr("coverImage", "src", asset(config.images.cover));
   attr("coupleImage", "src", asset(config.images.couple));
   attr("giftImage", "src", asset(config.images.gift));
+  cssImage("--bg-image", config.images.background);
+  cssImage("--wave-image", config.images.wave);
   if (musicEnabled) attr("bgMusic", "src", asset(config.music.src));
 
   applyVisibilityConfig();
@@ -188,6 +198,7 @@ function renderEvents() {
   const eventGrid = $("eventGrid");
   if (!eventGrid) return;
 
+  eventGrid.classList.toggle("single", config.events.length === 1);
   eventGrid.innerHTML = config.events.map(event => {
     const ceremony = getCeremony(event);
 
@@ -218,12 +229,88 @@ function renderAlbum() {
   const items = limit > 0 ? config.album.slice(0, limit) : config.album;
 
   albumGrid.innerHTML = items.map(item => `
-    <button class="album-item" type="button" data-img="${escapeHtml(asset(item.src))}">
+    <button class="album-item ${ALBUM_RATIOS[item.orientation] ? item.orientation : "auto"}" type="button"
+      data-ratio="${ALBUM_RATIOS[item.orientation] || 1}" data-img="${escapeHtml(asset(item.src))}">
       <img src="${escapeHtml(asset(item.src))}" alt="${escapeHtml(item.alt || "Ảnh album")}" />
     </button>
   `).join("");
 
+  // Ảnh chưa chọn hướng trong Setting: đo theo kích thước thật khi ảnh tải xong.
+  albumGrid.querySelectorAll(".album-item.auto img").forEach(img => {
+    img.addEventListener("load", () => {
+      img.parentElement.dataset.ratio = img.naturalWidth / img.naturalHeight;
+      layoutAlbum();
+    });
+  });
+
   bindAlbumLightbox();
+  layoutAlbum();
+}
+
+// Xếp album thành các hàng cao bằng nhau, mỗi ô đúng tỉ lệ dọc/ngang/vuông.
+// Chọn cách chia hàng cho chiều cao các hàng gần chuẩn nhất, tức ít khoảng trống thừa nhất.
+// Hàng ít ảnh không bị phóng quá cỡ mà căn giữa; khung album co theo hàng rộng nhất.
+function layoutAlbum() {
+  const albumGrid = $("albumGrid");
+  if (!albumGrid?.parentElement.clientWidth) return; // Thiệp chưa mở (đang ẩn): xếp lại khi mở.
+
+  const frame = getComputedStyle(albumGrid);
+  const gap = parseFloat(frame.rowGap) || 0;
+  const width = albumGrid.parentElement.clientWidth
+    - 2 * (parseFloat(frame.paddingLeft) + parseFloat(frame.borderLeftWidth));
+  const target = width < 640 ? 240 : 300;
+  const maxHeight = target * 1.2;
+  const items = [...albumGrid.querySelectorAll(".album-item")];
+  const ratios = items.map(item => Number(item.dataset.ratio) || 1);
+  const fitHeight = (from, to) => {
+    const ratioSum = ratios.slice(from, to).reduce((a, b) => a + b, 0);
+    return (width - gap * (to - from - 1)) / ratioSum;
+  };
+
+  // cost[j]: tổng độ lệch nhỏ nhất khi xếp j ảnh đầu; start[j]: ảnh mở đầu hàng cuối trong cách xếp đó.
+  const cost = [0];
+  const start = [0];
+  for (let j = 1; j <= items.length; j++) {
+    cost[j] = Infinity;
+    for (let i = j - 1; i >= 0; i--) {
+      const height = fitHeight(i, j);
+      if (height < target / 2 && i < j - 1) break; // Hàng đã quá chật, thêm ảnh chỉ chật hơn.
+      const total = cost[i] + Math.log(height / target) ** 2;
+      if (total < cost[j]) {
+        cost[j] = total;
+        start[j] = i;
+      }
+    }
+  }
+
+  const rows = [];
+  for (let j = items.length; j > 0; j = start[j]) rows.unshift([start[j], j]);
+
+  albumGrid.replaceChildren(...rows.map(([from, to]) => {
+    const height = Math.min(maxHeight, fitHeight(from, to));
+    const line = document.createElement("div");
+    line.className = "album-line";
+    items.slice(from, to).forEach((item, index) => {
+      item.style.width = `${Math.floor(ratios[from + index] * height)}px`;
+      item.style.height = `${Math.floor(height)}px`;
+    });
+    line.append(...items.slice(from, to));
+    return line;
+  }));
+}
+
+// Thiệp đã tắt trong Setting: chỉ hiện thông báo, không render nội dung nào.
+function renderUnavailable() {
+  document.title = "Thiệp chưa sẵn sàng";
+  document.body.innerHTML = `
+    <main class="section unavailable">
+      <div class="panel-card section-heading">
+        <p class="eyebrow">Wedding Invitation</p>
+        <h3>Thiệp chưa sẵn sàng</h3>
+        <p>Thiệp mời này đang được cập nhật. Bạn vui lòng quay lại sau.</p>
+      </div>
+    </main>
+  `;
 }
 
 function pad2(value) {
@@ -340,6 +427,7 @@ on("openInvite", "click", () => {
   if (cover) cover.remove();
   if (mainContent) mainContent.classList.remove("hidden");
   window.scrollTo({ top: 0, behavior: "smooth" });
+  layoutAlbum();
   playMusic();
 
   if (config.ui.autoScroll !== false) {
@@ -372,6 +460,8 @@ window.addEventListener("wheel", () => {
 window.addEventListener("touchmove", () => {
   if (isAutoScrolling) stopAutoScroll();
 }, { passive: true });
+
+window.addEventListener("resize", () => requestAnimationFrame(layoutAlbum));
 
 on("closeLightbox", "click", () => {
   if (lightbox) lightbox.close();
@@ -432,7 +522,11 @@ on("exportRsvp", "click", () => {
   URL.revokeObjectURL(url);
 });
 
-renderConfig();
-updateCountdown();
-setInterval(updateCountdown, 1000);
-renderRsvps();
+if (config.enabled === false) {
+  renderUnavailable();
+} else {
+  renderConfig();
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+  renderRsvps();
+}

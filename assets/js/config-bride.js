@@ -39,7 +39,9 @@ window.WEDDING_CONFIG = {
   "images": {
     "cover": "assets/images/backgrounds/background1.svg",
     "couple": "assets/images/main_couple.jpg",
-    "gift": "assets/images/d3.svg"
+    "gift": "assets/images/d3.svg",
+    "background": "",
+    "wave": ""
   },
   "ui": {
     "autoScroll": true,
@@ -96,15 +98,18 @@ window.WEDDING_CONFIG = {
   "album": [
     {
       "src": "assets/images/album_1.jpg",
-      "alt": "Ảnh album 1"
+      "alt": "Ảnh album 1",
+      "orientation": ""
     },
     {
       "src": "assets/images/album_2.jpg",
-      "alt": "Ảnh album 2"
+      "alt": "Ảnh album 2",
+      "orientation": ""
     },
     {
       "src": "assets/images/album_3.jpg",
-      "alt": "Ảnh album 3"
+      "alt": "Ảnh album 3",
+      "orientation": ""
     }
   ],
   "bank": {

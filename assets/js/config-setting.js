@@ -29,7 +29,9 @@ window.WEDDING_SETTING = {
   "images": {
     "cover": "assets/images/backgrounds/background1.svg",
     "couple": "assets/images/main_couple.jpg",
-    "gift": "assets/images/d3.svg"
+    "gift": "assets/images/d3.svg",
+    "background": "",
+    "wave": ""
   },
   "ui": {
     "autoScroll": true,
@@ -52,15 +54,18 @@ window.WEDDING_SETTING = {
   "album": [
     {
       "src": "assets/images/album_1.jpg",
-      "alt": "Ảnh album 1"
+      "alt": "Ảnh album 1",
+      "orientation": ""
     },
     {
       "src": "assets/images/album_2.jpg",
-      "alt": "Ảnh album 2"
+      "alt": "Ảnh album 2",
+      "orientation": ""
     },
     {
       "src": "assets/images/album_3.jpg",
-      "alt": "Ảnh album 3"
+      "alt": "Ảnh album 3",
+      "orientation": ""
     }
   ],
   "bank": {
@@ -70,6 +75,7 @@ window.WEDDING_SETTING = {
   },
   "families": {
     "groom": {
+      "enabled": true,
       "label": "Nhà trai",
       "invitationTitle": "Tiệc cưới tại nhà trai",
       "dates": {
@@ -91,6 +97,7 @@ window.WEDDING_SETTING = {
       "imageAlt": "Bản đồ nhà trai"
     },
     "bride": {
+      "enabled": true,
       "label": "Nhà gái",
       "invitationTitle": "Tiệc cưới tại nhà gái",
       "dates": {

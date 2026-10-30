@@ -59,17 +59,48 @@ Trang Setting chỉ đọc `config-setting.js`. Mỗi lần lưu, 2 file thiệp
 | Phần | Nội dung |
 |---|---|
 | Thông tin chung | Tên chú rể, cô dâu; nhạc nền; tự cuộn trang |
-| Nhà trai & nhà gái | Địa chỉ, link Google Maps, ảnh bản đồ, giờ tiệc (cỗ), giờ lễ, ngày đếm ngược, ngày hiển thị, tiêu đề lời mời |
+| Nhà trai & nhà gái | Bật/tắt thiệp từng nhà, địa chỉ, link Google Maps, ảnh bản đồ, giờ tiệc (cỗ), giờ lễ, ngày đếm ngược, ngày hiển thị, tiêu đề lời mời |
 | Bìa | Dòng chữ, nút mở thiệp, ảnh bìa |
+| Ảnh nền | Ảnh nền nội dung thiệp, ảnh trang trí khung trang chủ (wave). Để trống = ảnh mặc định |
 | Trang chủ & đếm ngược | Lời giới thiệu, mô tả, bật/tắt đồng hồ |
 | Ảnh cặp đôi & lời mời | Ảnh cặp đôi, khung lời mời |
 | Buổi lễ | Tiêu đề phần lễ của 2 nhà |
-| Album | Thêm/xóa/sắp xếp ảnh, số ảnh hiển thị (0 = tất cả) |
+| Album | Thêm/xóa/sắp xếp ảnh, hướng ảnh Dọc/Ngang/Vuông, số ảnh hiển thị (0 = tất cả) |
 | Mừng cưới | Mô tả, ảnh, thông tin ngân hàng |
 | RSVP | Bật/tắt form xác nhận tham dự |
 | Lời cảm ơn | Tiêu đề, nội dung |
 
 Mỗi phần có checkbox **Hiển thị phần này**, áp dụng cho cả 2 thiệp.
+
+### Xuất / nhập dữ liệu (sao lưu đầy đủ)
+
+- **Xuất dữ liệu**: tải 1 file `wedding-backup-YYYYMMDD.json` gồm toàn bộ nội dung Setting **và mọi ảnh/nhạc đang dùng** (ảnh bìa, ảnh nền, wave, ảnh cặp đôi, ảnh mừng cưới, bản đồ, album, nhạc nền). File có thể nặng vài chục MB vì chứa cả nhạc. Link `https://...` không được xuất kèm. File nào không tìm thấy sẽ được báo tên.
+- **Nhập dữ liệu…**: chọn file sao lưu, trang chép lại ảnh/nhạc vào đúng đường dẫn cũ trong project (ghi đè file trùng tên, có hỏi xác nhận) rồi nạp dữ liệu. Bấm **Lưu** để cập nhật 2 thiệp.
+- Nhập cũng nhận file `config-setting.js` của project khác (kể cả bản code cũ); khi đó chỉ có dữ liệu, ảnh/nhạc phải chép tay. Trường mới chưa có trong dữ liệu cũ sẽ lấy giá trị mặc định.
+- Xuất/nhập kèm ảnh/nhạc cần Chrome/Edge và chọn thư mục gốc của project.
+
+**Cập nhật code mới cho một bản copy cũ** (giữ nguyên nội dung thiệp của bản copy):
+
+1. Chép code mới đè lên bản copy, **trừ** 3 file `assets/js/config-*.js` và các ảnh/nhạc của bản copy.
+2. Mở `Setting/index.html` của bản copy, bấm **Lưu** để tạo lại 2 file thiệp theo code mới.
+
+Nếu lỡ ghi đè `config-setting.js`, dùng **Nhập dữ liệu…** với file `config-setting.js` cũ (lấy từ git hoặc bản sao lưu) rồi bấm Lưu.
+
+### Tắt thiệp một nhà
+
+Bỏ chọn **Bật thiệp của nhà này** trong phần Nhà trai & nhà gái (ví dụ chỉ dùng thiệp nhà gái):
+
+- Link thiệp nhà đó (`Groom/` hoặc `Bride/`) chỉ hiện *"Thiệp chưa sẵn sàng"*; file `config-<nhà>.js` không còn dữ liệu.
+- Trang chọn thiệp ẩn thiệp đó. Chỉ còn 1 thiệp thì tự chuyển thẳng tới thiệp còn lại.
+- Thiệp nhà còn lại ẩn mọi thông tin của nhà đã tắt (lễ, địa chỉ, bản đồ).
+- Thông tin nhà đã tắt vẫn nằm trong `config-setting.js` (cũng được publish). Nếu là thông tin nhạy cảm, hãy xóa trắng trước khi push.
+
+### Album: ảnh dọc / ngang / vuông
+
+- Mỗi ảnh có ô chọn **Dọc** (2:3), **Ngang** (3:2), **Vuông** (1:1) hoặc **Tự động** (thiệp tự đo theo ảnh thật).
+- Khi tải ảnh lên hoặc đổi đường dẫn, hướng được tự nhận diện; có thể sửa lại bằng tay.
+- Thiệp đặt ảnh trong một khung, xếp thành từng hàng cao bằng nhau. Cách chia hàng được chọn sao cho ít khoảng trống thừa nhất; album ít ảnh thì khung co lại và nằm giữa. Bấm vào ảnh để xem ảnh đầy đủ, không bị cắt.
+- Ảnh bản đồ của mỗi nhà hiển thị trong khung vuông, hiện đủ cả ảnh (dùng được cho ảnh QR).
 
 ### Thứ tự theo thiệp
 

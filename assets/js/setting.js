@@ -11,6 +11,7 @@ let rootDir = null;
 let dirty = false;
 
 const familyFields = [
+  { path: "enabled", label: "Bật thiệp của nhà này", type: "checkbox", wide: true },
   { path: "label", label: "Tên hiển thị (badge)" },
   { path: "invitationTitle", label: "Tiêu đề khung lời mời", hint: "Ví dụ: Tiệc cưới tại nhà trai" },
   { path: "dates.weddingDate", label: "Ngày giờ đếm ngược (giờ VN)", type: "datetime" },
@@ -39,7 +40,12 @@ const sections = [
       { path: "music.src", label: "File nhạc", type: "audio", wide: true }
     ]
   },
-  { id: "families", title: "Thông tin nhà trai & nhà gái", custom: renderFamilies },
+  {
+    id: "families",
+    title: "Thông tin nhà trai & nhà gái",
+    note: "Tắt thiệp một nhà: link thiệp đó chỉ hiện \"Thiệp chưa sẵn sàng\", trang chọn thiệp ẩn thiệp đó, thiệp nhà còn lại ẩn mọi thông tin của nhà này (lễ, địa chỉ, bản đồ).",
+    custom: renderFamilies
+  },
   {
     id: "cover",
     title: "Màn hình bìa",
@@ -47,6 +53,15 @@ const sections = [
       { path: "text.coverEyebrow", label: "Dòng chữ trên tên" },
       { path: "text.openButton", label: "Chữ trên nút mở thiệp" },
       { path: "images.cover", label: "Ảnh bìa", type: "image", wide: true }
+    ]
+  },
+  {
+    id: "backgrounds",
+    title: "Ảnh nền",
+    note: "Để trống = dùng ảnh mặc định. Áp dụng cho cả 2 thiệp và trang chọn thiệp.",
+    fields: [
+      { path: "images.background", label: "Ảnh nền nội dung thiệp (sau khi mở thiệp)", type: "image", wide: true },
+      { path: "images.wave", label: "Ảnh trang trí khung trang chủ (wave)", type: "image", wide: true }
     ]
   },
   {
@@ -74,7 +89,7 @@ const sections = [
     id: "event",
     title: "Thông tin buổi lễ",
     toggle: "ui.sections.event",
-    note: "Hiện lễ của cả 2 nhà, nhà của thiệp đứng trước. Thời gian lễ sửa ở phần Thông tin nhà trai & nhà gái.",
+    note: "Hiện lễ của cả 2 nhà (nhà nào tắt thiệp thì ẩn), nhà của thiệp đứng trước. Thời gian lễ sửa ở phần Thông tin nhà trai & nhà gái.",
     fields: [
       { path: "text.eventEyebrow", label: "Dòng chữ nhỏ" },
       { path: "text.eventTitle", label: "Tiêu đề" }
@@ -84,6 +99,7 @@ const sections = [
     id: "album",
     title: "Album ảnh",
     toggle: "ui.sections.album",
+    note: "Mỗi ảnh chọn hướng Dọc / Ngang / Vuông để thiệp xếp khung đúng tỉ lệ. Khi chọn hoặc tải ảnh, hướng được tự nhận diện, bạn vẫn sửa lại được. \"Tự động\" = thiệp tự đo theo ảnh.",
     fields: [
       { path: "text.albumEyebrow", label: "Dòng chữ nhỏ" },
       { path: "text.albumTitle", label: "Tiêu đề" },
@@ -331,6 +347,15 @@ async function uploadFile(file, dirPath) {
   return `${dirPath}/${name}`;
 }
 
+function detectOrientation(path) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(SettingModel.orientationOf(img.naturalWidth, img.naturalHeight));
+    img.onerror = () => resolve("");
+    img.src = assetUrl(path);
+  });
+}
+
 function chooseFiles(accept, multiple) {
   return new Promise(resolve => {
     const input = el("input", { type: "file", accept, multiple });
@@ -432,7 +457,7 @@ function renderAlbum(container) {
     for (const file of files) {
       const path = await uploadFile(file, `${IMAGE_DIR}/album`);
       if (!path) return;
-      model.album.push({ src: path, alt: `Ảnh album ${model.album.length + 1}` });
+      model.album.push({ src: path, alt: `Ảnh album ${model.album.length + 1}`, orientation: await detectOrientation(path) });
     }
     if (files.length) {
       markDirty();
@@ -442,7 +467,7 @@ function renderAlbum(container) {
 
   const addRow = el("button", { type: "button", textContent: "Thêm dòng (chọn ảnh có sẵn)" });
   addRow.addEventListener("click", () => {
-    model.album.push({ src: "", alt: `Ảnh album ${model.album.length + 1}` });
+    model.album.push({ src: "", alt: `Ảnh album ${model.album.length + 1}`, orientation: "" });
     markDirty();
     renderAlbumList();
   });
@@ -470,6 +495,18 @@ function renderAlbumList() {
       markDirty();
     });
 
+    const orientation = el("select", { title: "Hướng ảnh" }, [
+      ["", "Tự động"],
+      ["portrait", "Dọc"],
+      ["landscape", "Ngang"],
+      ["square", "Vuông"]
+    ].map(([value, textContent]) => el("option", { value, textContent })));
+    orientation.value = item.orientation;
+    orientation.addEventListener("change", () => {
+      item.orientation = orientation.value;
+      markDirty();
+    });
+
     const button = (label, title, onClick, cls = "") => {
       const b = el("button", { type: "button", textContent: label, title, class: cls });
       b.addEventListener("click", onClick);
@@ -492,8 +529,15 @@ function renderAlbumList() {
       filePicker(item.src, value => {
         item.src = value;
         markDirty();
+        // Đổi ảnh thì nhận diện lại hướng (bỏ qua nếu ảnh đã đổi tiếp trong lúc chờ tải).
+        detectOrientation(value).then(found => {
+          if (!found || item.src !== value) return;
+          item.orientation = found;
+          orientation.value = found;
+        });
       }, "image"),
       alt,
+      orientation,
       actions
     ]);
   });
@@ -571,6 +615,104 @@ function download(name, content) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+// Đọc file trong project: qua thư mục đã chọn nếu có (mở bằng file:// không fetch được), không thì tải qua URL.
+async function readProjectFile(path) {
+  if (rootDir) {
+    const parts = path.split("/");
+    const name = parts.pop();
+    return (await (await getDir(parts.join("/"))).getFileHandle(name)).getFile();
+  }
+  const response = await fetch(assetUrl(path));
+  if (!response.ok) throw new Error(`${response.status}`);
+  return response.blob();
+}
+
+function toDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+// Xuất 1 file sao lưu gồm dữ liệu Setting và mọi ảnh/nhạc đang dùng, nhập lại ở project khác không mất gì.
+async function exportData() {
+  if (window.showDirectoryPicker && !(await ensureFolder())) {
+    setStatus("Chưa xuất: cần chọn thư mục gốc của project để đọc ảnh/nhạc.", "error");
+    return;
+  }
+  setStatus("Đang xuất dữ liệu và ảnh/nhạc...");
+  const files = {};
+  const missing = [];
+  for (const path of SettingModel.assetPaths(model)) {
+    try {
+      files[path] = await toDataUrl(await readProjectFile(path));
+    } catch {
+      missing.push(path);
+    }
+  }
+
+  const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  const blob = new Blob([SettingModel.serializeBackup(model, files)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  el("a", { href: url, download: `wedding-backup-${stamp}.json` }).click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  const size = (blob.size / 1024 / 1024).toFixed(1);
+  const count = Object.keys(files).length;
+  if (missing.length) {
+    setStatus(`Đã xuất (${size} MB, ${count} file ảnh/nhạc). Không tìm thấy, không xuất được: ${missing.join(", ")}`, "error");
+  } else {
+    setStatus(`Đã xuất đầy đủ dữ liệu và ${count} file ảnh/nhạc (${size} MB).`, "ok");
+  }
+}
+
+// Nhập file sao lưu: chép ảnh/nhạc vào đúng đường dẫn trong project rồi nạp dữ liệu (config chỉ ghi khi bấm Lưu).
+async function importData() {
+  const [file] = await chooseFiles(".json,.js", false);
+  if (!file) return;
+  if (dirty && !confirm("Bỏ các thay đổi chưa lưu và nhập dữ liệu từ file?")) return;
+
+  let imported;
+  try {
+    imported = SettingModel.parseSettingText(await file.text());
+  } catch (error) {
+    setStatus(`Nhập thất bại: ${error.message}`, "error");
+    return;
+  }
+
+  const paths = Object.keys(imported.files);
+  let note = "";
+  if (paths.length && !window.showDirectoryPicker) {
+    note = ` Trình duyệt này không ghi được file nên ${paths.length} ảnh/nhạc chưa được chép vào project, hãy dùng Chrome/Edge.`;
+  } else if (paths.length) {
+    if (!(await ensureFolder())) {
+      setStatus("Chưa nhập: cần chọn thư mục gốc của project để chép ảnh/nhạc.", "error");
+      return;
+    }
+    const list = paths.slice(0, 15).map(path => `• ${path}`).join("\n")
+      + (paths.length > 15 ? `\n… và ${paths.length - 15} file khác` : "");
+    if (!confirm(`Chép ${paths.length} file ảnh/nhạc vào thư mục "${rootDir.name}"? File trùng tên sẽ bị ghi đè.\n\n${list}`)) {
+      setStatus("Đã hủy nhập.");
+      return;
+    }
+    try {
+      for (const path of paths) await writeFile(path, await (await fetch(imported.files[path])).blob());
+    } catch (error) {
+      setStatus(`Nhập thất bại khi chép ảnh/nhạc: ${error.message}`, "error");
+      return;
+    }
+    await refreshFileLists();
+    note = ` Đã chép ${paths.length} file ảnh/nhạc vào project.`;
+  }
+
+  model = imported.model;
+  renderForm();
+  markDirty();
+  setStatus(`Đã nhập dữ liệu từ "${file.name}".${note} Kiểm tra lại rồi bấm Lưu để cập nhật 2 thiệp.`, "ok");
+}
+
 async function save() {
   const files = SettingModel.configFiles(model);
   try {
@@ -603,6 +745,8 @@ async function save() {
 
 document.getElementById("pickFolder").addEventListener("click", pickFolder);
 document.getElementById("save").addEventListener("click", save);
+document.getElementById("exportData").addEventListener("click", exportData);
+document.getElementById("importData").addEventListener("click", importData);
 document.getElementById("reload").addEventListener("click", () => {
   if (dirty && !confirm("Bỏ các thay đổi chưa lưu?")) return;
   loadModel();
