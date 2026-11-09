@@ -12,6 +12,7 @@ let dirty = false;
 
 const familyFields = [
   { path: "enabled", label: "Bật thiệp của nhà này", type: "checkbox", wide: true },
+  { path: "showOtherFamily", label: "Hiện cả thông tin lễ của nhà kia (bỏ chọn: chỉ hiện lễ, địa chỉ, bản đồ của nhà này)", type: "checkbox", wide: true },
   { path: "label", label: "Tên hiển thị (badge)" },
   { path: "invitationTitle", label: "Tiêu đề khung lời mời", hint: "Ví dụ: Tiệc cưới tại nhà trai" },
   { path: "dates.weddingDate", label: "Ngày giờ đếm ngược (giờ VN)", type: "datetime" },
@@ -89,7 +90,7 @@ const sections = [
     id: "event",
     title: "Thông tin buổi lễ",
     toggle: "ui.sections.event",
-    note: "Hiện lễ của cả 2 nhà (nhà nào tắt thiệp thì ẩn), nhà của thiệp đứng trước. Thời gian lễ sửa ở phần Thông tin nhà trai & nhà gái.",
+    note: "Hiện lễ của cả 2 nhà (nhà nào tắt thiệp, hoặc bỏ chọn \"Hiện cả thông tin lễ của nhà kia\", thì ẩn), nhà của thiệp đứng trước. Thời gian lễ sửa ở phần Thông tin nhà trai & nhà gái.",
     fields: [
       { path: "text.eventEyebrow", label: "Dòng chữ nhỏ" },
       { path: "text.eventTitle", label: "Tiêu đề" }

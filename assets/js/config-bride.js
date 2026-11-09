@@ -2,20 +2,20 @@
 // Mọi đường dẫn ảnh/nhạc tính từ thư mục gốc của project, ví dụ: assets/images/abc.jpg
 window.WEDDING_CONFIG = {
   "side": "bride",
-  "siteTitle": "Thiệp Cưới - Adu Vlluon & Mạnh Quyết",
-  "description": "Thiệp cưới online của Adu Vlluon & Mạnh Quyết.",
+  "siteTitle": "Thiệp Cưới - Nguyệt Quỳnh & Công Duy",
+  "description": "Thiệp cưới online của Nguyệt Quỳnh & Công Duy.",
   "couple": {
-    "groomName": "Mạnh Quyết",
-    "brideName": "Adu Vlluon"
+    "groomName": "Công Duy",
+    "brideName": "Nguyệt Quỳnh"
   },
   "dates": {
-    "weddingDate": "2026-12-19T17:00:00+07:00",
-    "coverDate": "Thứ 7, 19 tháng 12, 2026",
-    "displayDate": "19.12.2026"
+    "weddingDate": "2026-11-14T00:00:00+07:00",
+    "coverDate": "Thứ 7, 14 tháng 11, 2026",
+    "displayDate": "14.11.2026"
   },
   "music": {
     "enabled": true,
-    "src": "assets/audio/Bruno Mars - Marry You (Official Lyric Video).mp3"
+    "src": "assets/audio/Photograph-1.mp3"
   },
   "text": {
     "coverEyebrow": "Wedding Invitation",
@@ -37,11 +37,11 @@ window.WEDDING_CONFIG = {
     "invitationTitle": "Tiệc cưới tại nhà gái"
   },
   "images": {
-    "cover": "assets/images/backgrounds/background1.svg",
-    "couple": "assets/images/main_couple.jpg",
+    "cover": "assets/images/bg2.png",
+    "couple": "assets/images/main.jpg",
     "gift": "assets/images/d3.svg",
-    "background": "",
-    "wave": ""
+    "background": "assets/images/bg2.png",
+    "wave": "assets/images/wave2.png"
   },
   "ui": {
     "autoScroll": true,
@@ -67,49 +67,48 @@ window.WEDDING_CONFIG = {
       "label": "Nhà gái",
       "ceremony": {
         "title": "Lễ vu quy - Nhà gái",
-        "time": "09:00, 20/12/2026"
+        "time": "08:00, 14/11/2026"
       },
       "reception": {
         "title": "Tiệc cưới - Nhà gái",
-        "time": "17:00, 19/12/2026"
+        "time": "11:30, 14/11/2026"
       },
-      "address": "Tổ dân phố Vũ Chính, Phường Trần Lãm, Tỉnh Hưng Yên (Địa chỉ cũ là xóm 13, Thôn Lạc Chính, Xã Vũ Chính, Thành Phố Thái Bình, Tỉnh Thái Bình)",
-      "mapUrl": "https://www.google.com/maps",
-      "image": "assets/images/map_bride.png",
+      "address": "Số 192 Ngô Gia Tự, Phường Phú Yên, Tỉnh Đắk Lắk",
+      "mapUrl": "https://www.google.com/maps/place/192+Ng%C3%B4+Gia+T%E1%BB%B1,+Ph%C3%BA+Y%C3%AAn,+%C4%90%E1%BA%AFk+L%E1%BA%AFk,+Vi%E1%BB%87t+Nam/@13.0637299,109.325023,974m/data=!3m2!1e3!4b1!4m6!3m5!1s0x316fee86d8c124d3:0x2465adcc2f50c75a!8m2!3d13.0637299!4d109.3275979!16s%2Fg%2F11f57qgzn2?entry=ttu&g_ep=EgoyMDI2MTAyNy4wIKXMDSoASAFQAw%3D%3D",
+      "image": "assets/images/bride.png",
       "imageAlt": "Bản đồ nhà gái"
-    },
-    {
-      "key": "groom",
-      "label": "Nhà trai",
-      "ceremony": {
-        "title": "Lễ tân hôn - Nhà trai",
-        "time": "10:00, 20/12/2026"
-      },
-      "reception": {
-        "title": "Tiệc cưới - Nhà trai",
-        "time": "17:00, 19/12/2026"
-      },
-      "address": "Tổ dân phố Vũ Chính, Phường Trần Lãm, Tỉnh Hưng Yên (Địa chỉ cũ là xóm 13, Thôn Lạc Chính, Xã Vũ Chính, Thành Phố Thái Bình, Tỉnh Thái Bình)",
-      "mapUrl": "https://www.google.com/maps",
-      "image": "assets/images/map_groom.png",
-      "imageAlt": "Bản đồ nhà trai"
     }
   ],
   "album": [
     {
-      "src": "assets/images/album_1.jpg",
+      "src": "assets/images/2aobor8ramaes9ict95xglcedzcfunhijhxjpb4a1-1.jpg",
       "alt": "Ảnh album 1",
-      "orientation": ""
+      "orientation": "portrait"
     },
     {
-      "src": "assets/images/album_2.jpg",
+      "src": "assets/images/2aobor8ramrc68qys8iadfk2aron9iax58kepdce6-1.jpg",
       "alt": "Ảnh album 2",
-      "orientation": ""
+      "orientation": "portrait"
     },
     {
-      "src": "assets/images/album_3.jpg",
+      "src": "assets/images/2aobor8ramsvzka7gww0fecqaiy3yvjhvjfj6uj23-1.jpg",
       "alt": "Ảnh album 3",
-      "orientation": ""
+      "orientation": "portrait"
+    },
+    {
+      "src": "assets/images/2aobor8ramsvzka7gww0fesypwgzrl2cx3md6am42-1.jpg",
+      "alt": "Ảnh album 4",
+      "orientation": "portrait"
+    },
+    {
+      "src": "assets/images/2aobor8ramsvzka7gww0fezmzch0fpb8plyd6j2u4-1.jpg",
+      "alt": "Ảnh album 5",
+      "orientation": "portrait"
+    },
+    {
+      "src": "assets/images/2aobor8ramyha6zqg305lcw8ub8llrwjaiyevipc5-1.jpg",
+      "alt": "Ảnh album 6",
+      "orientation": "portrait"
     }
   ],
   "bank": {
