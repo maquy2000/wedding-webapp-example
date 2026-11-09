@@ -17,13 +17,22 @@ function loadScript(file, name) {
 const model0 = () => JSON.parse(JSON.stringify(M.normalizeModel(loadScript("assets/js/config-setting.js", "WEDDING_SETTING"))));
 const model = model0();
 
-// Mỗi lần lưu ghi 3 file. Test không bắt 2 file thiệp trên đĩa phải khớp Setting: khi deploy chúng được tạo lại (scripts/build-site.js).
+// Mỗi lần lưu chỉ ghi 1 file dữ liệu gốc.
 const files = M.configFiles(model);
-assert.deepStrictEqual(Object.keys(files).sort(), [
-  "assets/js/config-bride.js",
-  "assets/js/config-groom.js",
-  "assets/js/config-setting.js"
-]);
+assert.deepStrictEqual(Object.keys(files), ["assets/js/config-setting.js"]);
+
+// Trên máy, mỗi trang thiệp nạp config-setting.js + setting-model.js + config-<nhà>.js (đúng thứ tự trong HTML)
+// và tự tạo thông tin thiệp từ Setting, nên 2 thiệp luôn theo cùng một Setting.
+for (const side of M.SIDES) {
+  const page = fs.readFileSync(path.join(root, side === "groom" ? "Groom/index.html" : "Bride/index.html"), "utf8");
+  const scripts = [...page.matchAll(/<script src="\.\.\/([^"?]+)/g)].map(m => m[1]);
+  assert.deepStrictEqual(scripts, ["assets/js/config-setting.js", "assets/js/setting-model.js", `assets/js/config-${side}.js`, "assets/js/app.js"]);
+  const context = {};
+  context.window = context;
+  scripts.slice(0, 3).forEach(file => vm.runInNewContext(fs.readFileSync(path.join(root, file), "utf8"), context));
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(context.WEDDING_CONFIG)), JSON.parse(JSON.stringify(M.buildConfig(model, side))),
+    `thiệp ${side} không theo Setting`);
+}
 
 // Các kiểm tra dưới đây cần cả 2 thiệp bật và hiện cả 2 nhà, dù dữ liệu thật trên đĩa đang chọn thế nào.
 model.families.groom.enabled = true;
@@ -143,7 +152,9 @@ for (const side of M.SIDES) {
 for (const p of ["index.html", "Groom/index.html", "Bride/index.html", "assets/js/app.js", "assets/css/style.css"]) {
   assert.ok(fs.existsSync(path.join(site, p)), `bản deploy thiếu ${p}`);
 }
-for (const p of ["assets/js/config-setting.js", "Setting", "tests", "scripts", ".git", ".github"]) {
+const builtSetting = fs.readFileSync(path.join(site, "assets/js/config-setting.js"), "utf8");
+assert.ok(!builtSetting.includes("WEDDING_SETTING ="), "bản deploy không được chứa dữ liệu Setting");
+for (const p of ["Setting", "tests", "scripts", ".git", ".github"]) {
   assert.ok(!fs.existsSync(path.join(site, p)), `bản deploy không được có ${p}`);
 }
 for (const side of M.SIDES) {

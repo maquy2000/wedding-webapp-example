@@ -1,4 +1,4 @@
-// Tạo 2 file config-groom.js / config-bride.js từ dữ liệu gốc config-setting.js của trang Setting.
+// Tạo thông tin thiệp nhà trai / nhà gái từ dữ liệu gốc config-setting.js của trang Setting.
 // Không đụng tới DOM để có thể test bằng node (tests/setting-model.test.js).
 (function (root) {
   const SIDES = ["groom", "bride"];
@@ -153,7 +153,7 @@
   }
 
   function serializeConfig(config) {
-    return "// File này được tạo bởi Setting/index.html. Nên sửa bằng trang Setting thay vì sửa tay.\n"
+    return "// File này được tạo khi deploy (scripts/build-site.js) từ dữ liệu Setting. Sửa bằng trang Setting, không sửa tay.\n"
       + "// Mọi đường dẫn ảnh/nhạc tính từ thư mục gốc của project, ví dụ: assets/images/abc.jpg\n"
       + "window.WEDDING_CONFIG = " + JSON.stringify(config, null, 2) + ";\n";
   }
@@ -209,13 +209,10 @@
     return { model: normalizeModel(setting), files };
   }
 
-  // 3 file được ghi mỗi lần lưu: dữ liệu gốc + 2 thiệp.
+  // Mỗi lần lưu chỉ ghi 1 file dữ liệu gốc. 2 thiệp tự tạo thông tin từ file này khi mở (config-groom.js / config-bride.js),
+  // nên không bao giờ lệch nhau. Khi deploy, scripts/build-site.js mới tạo sẵn dữ liệu riêng cho từng thiệp.
   function configFiles(model) {
-    const files = { "assets/js/config-setting.js": serializeSetting(model) };
-    SIDES.forEach(side => {
-      files[`assets/js/config-${side}.js`] = serializeConfig(buildConfig(model, side));
-    });
-    return files;
+    return { "assets/js/config-setting.js": serializeSetting(model) };
   }
 
   const api = { SIDES, ORIENTATIONS, orientationOf, defaultModel, normalizeModel, buildConfig, serializeConfig, serializeSetting, isProjectAsset, assetPaths, serializeBackup, parseSettingText, configFiles };

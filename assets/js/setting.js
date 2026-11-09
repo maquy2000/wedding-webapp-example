@@ -1,5 +1,5 @@
-// Trang Setting: đọc dữ liệu gốc assets/js/config-setting.js, khi lưu ghi lại file đó và tạo lại config-groom.js, config-bride.js.
-// Ghi file trực tiếp cần File System Access API (Chrome/Edge). Trình duyệt khác sẽ tải 3 file về.
+// Trang Setting: đọc dữ liệu gốc assets/js/config-setting.js, khi lưu ghi lại đúng file đó (2 thiệp tự lấy thông tin từ file này).
+// Ghi file trực tiếp cần File System Access API (Chrome/Edge). Trình duyệt khác sẽ tải file về.
 const ROOT_URL = new URL("../../", document.currentScript.src);
 const IMAGE_DIR = "assets/images";
 const AUDIO_DIR = "assets/audio";
@@ -251,6 +251,17 @@ async function refreshFileLists() {
 // Thư mục đã chọn được nhớ trong IndexedDB, các lần sau chỉ cần trình duyệt xác nhận quyền.
 let savedDir = null;
 
+// Mọi trang mở bằng file:// dùng chung IndexedDB, nên thư mục nhớ theo đường dẫn của từng project,
+// và chỉ nhận thư mục trùng tên project chứa trang Setting này (tránh lưu nhầm sang project khác).
+const SETTING_PATH = decodeURIComponent(location.pathname).replace(/\/[^/]*$/, "");
+const PROJECT_PATH = /\/Setting$/i.test(SETTING_PATH) ? SETTING_PATH.slice(0, -"/Setting".length) : "";
+const PROJECT_NAME = PROJECT_PATH.split("/").pop() || "";
+const FOLDER_KEY = `root:${PROJECT_PATH}`;
+
+function isThisProject(dir) {
+  return !PROJECT_NAME || dir.name === PROJECT_NAME;
+}
+
 function handleStore(mode, action) {
   return new Promise((resolve, reject) => {
     const open = indexedDB.open("wedding-setting", 1);
@@ -269,14 +280,14 @@ async function connectFolder(dir) {
   rootDir = dir;
   savedDir = dir;
   document.getElementById("pickFolder").textContent = `Thư mục: ${dir.name}`;
-  handleStore("readwrite", store => store.put(dir, "root")).catch(() => {});
+  handleStore("readwrite", store => store.put(dir, FOLDER_KEY)).catch(() => {});
   await refreshFileLists();
   setStatus(`Đã kết nối thư mục "${dir.name}". Có thể thêm ảnh và lưu trực tiếp.`, "ok");
 }
 
 async function pickFolder() {
   if (!window.showDirectoryPicker) {
-    alert("Trình duyệt này không hỗ trợ ghi file trực tiếp. Hãy dùng Chrome hoặc Edge, hoặc bấm Lưu để tải 3 file config về rồi chép vào assets/js/.");
+    alert("Trình duyệt này không hỗ trợ ghi file trực tiếp. Hãy dùng Chrome hoặc Edge, hoặc bấm Lưu để tải file config-setting.js về rồi chép vào assets/js/.");
     return false;
   }
   let dir;
@@ -289,6 +300,10 @@ async function pickFolder() {
     await (await (await dir.getDirectoryHandle("assets")).getDirectoryHandle("js")).getFileHandle("app.js");
   } catch {
     alert("Thư mục chưa đúng. Hãy chọn thư mục gốc của project (thư mục chứa index.html, Groom, Bride, Setting, assets).");
+    return false;
+  }
+  if (!isThisProject(dir)) {
+    alert(`Sai project: trang Setting này thuộc project "${PROJECT_NAME}" nhưng bạn chọn thư mục "${dir.name}".\nHãy chọn thư mục ${PROJECT_PATH.replace(/^\//, "")}`);
     return false;
   }
   await connectFolder(dir);
@@ -314,11 +329,14 @@ async function ensureFolder() {
 async function restoreFolder() {
   if (!window.showDirectoryPicker) return;
   try {
-    savedDir = await handleStore("readonly", store => store.get("root"));
+    savedDir = await handleStore("readonly", store => store.get(FOLDER_KEY));
   } catch {
     savedDir = null;
   }
-  if (!savedDir) return;
+  if (!savedDir || !isThisProject(savedDir)) {
+    savedDir = null;
+    return;
+  }
   try {
     if (await savedDir.queryPermission({ mode: "readwrite" }) === "granted") {
       await connectFolder(savedDir);
@@ -719,7 +737,7 @@ async function save() {
   try {
     if (!window.showDirectoryPicker) {
       Object.entries(files).forEach(([path, content]) => download(path.split("/").pop(), content));
-      setStatus("Đã tải 3 file config về. Hãy chép đè vào thư mục assets/js/ của project.", "ok");
+      setStatus("Đã tải file config-setting.js về. Hãy chép đè vào thư mục assets/js/ của project.", "ok");
       dirty = false;
       return;
     }
@@ -731,16 +749,18 @@ async function save() {
     }
 
     const list = Object.keys(files).map(path => `• ${rootDir.name}/${path}`).join("\n");
-    if (!confirm(`Lưu trực tiếp vào thư mục project?\n\n${list}\n\nThiệp nhà trai và nhà gái sẽ được tạo lại theo Setting (ghi đè nội dung cũ).`)) {
+    if (!confirm(`Lưu trực tiếp vào thư mục project?\n\n${list}\n\nCả thiệp nhà trai và nhà gái đều lấy thông tin từ file này nên cùng được cập nhật.`)) {
       setStatus("Đã hủy lưu.");
       return;
     }
 
+    setStatus("Đang lưu...");
     for (const [path, content] of Object.entries(files)) await writeFile(path, content);
-    setStatus(`Đã lưu vào ${rootDir.name}/assets/js/ (${new Date().toLocaleTimeString()}).`, "ok");
+    setStatus(`Đã lưu vào ${rootDir.name}/assets/js/config-setting.js (${new Date().toLocaleTimeString()}). Cả 2 thiệp đã cập nhật, mở lại thiệp để xem.`, "ok");
     dirty = false;
   } catch (error) {
     setStatus(`Lưu thất bại: ${error.message}`, "error");
+    alert(`Lưu thất bại, 2 thiệp chưa thay đổi.\n\n${error.message}`);
   }
 }
 

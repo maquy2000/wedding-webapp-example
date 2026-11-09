@@ -22,8 +22,8 @@ Bride/index.html              Thiệp nhà gái
 Setting/index.html            Trang cài đặt
 assets/
   js/config-setting.js        Dữ liệu gốc (trang Setting đọc/ghi)
-  js/config-groom.js          Dữ liệu thiệp nhà trai  (tự tạo, không sửa tay)
-  js/config-bride.js          Dữ liệu thiệp nhà gái   (tự tạo, không sửa tay)
+  js/config-groom.js          Thiệp nhà trai: tự lấy thông tin từ config-setting.js (không sửa)
+  js/config-bride.js          Thiệp nhà gái: tự lấy thông tin từ config-setting.js (không sửa)
   js/app.js                   Logic hiển thị thiệp
   js/setting.js               Logic trang Setting
   js/setting-model.js         Tạo dữ liệu 2 thiệp từ dữ liệu gốc
@@ -39,21 +39,24 @@ tests/setting-model.test.js   Test
 ### Luồng dữ liệu
 
 ```text
-Setting/index.html ──đọc──> config-setting.js
-        │
-        └─ bấm Lưu ──ghi──> config-setting.js
-                      ├───> config-groom.js  ──> Groom/index.html
-                      └───> config-bride.js  ──> Bride/index.html
+Setting/index.html ──đọc / bấm Lưu ghi──> config-setting.js   (1 file Setting chung, duy nhất)
+                                              │
+              Groom/index.html <── config-groom.js ──┤  mỗi lần mở thiệp, tự tạo thông tin từ config-setting.js
+              Bride/index.html <── config-bride.js ──┘
 ```
 
-Trang Setting chỉ đọc `config-setting.js`. Mỗi lần lưu, 2 file thiệp được tạo lại từ đó. Vì vậy **mọi thay đổi sửa tay trong `config-groom.js` / `config-bride.js` sẽ bị ghi đè**.
+Bấm Lưu chỉ ghi **1 file** `config-setting.js`. Cả 2 thiệp đọc chung file này khi mở, nên luôn cập nhật cùng lúc và không bao giờ lệch nhau. `config-groom.js` / `config-bride.js` chỉ là 1 dòng code, không chứa dữ liệu.
+
+Khi deploy, `scripts/build-site.js` tạo sẵn dữ liệu riêng cho từng thiệp vào 2 file này, và để rỗng `config-setting.js`, nên web không lộ thông tin cả 2 nhà trong một file.
 
 ### Lưu
 
 - **Thư mục cần chọn** là thư mục gốc chứa `index.html`, `Groom`, `Bride`, `Setting`, `assets`, ví dụ `D:\QGithub\WebAppTest\wedding-webapp-example`. Không chọn `assets` hay `assets/js`; nếu chọn sai, trang sẽ báo.
-- **Trước khi ghi**, trang hỏi *"Lưu trực tiếp vào thư mục project?"* và liệt kê 3 file sẽ ghi. Bấm OK để lưu.
-- **Thư mục được nhớ lại**. Lần sau chỉ cần xác nhận; khi mở lại trình duyệt, Chrome có thể hỏi lại quyền một lần. Muốn đổi thư mục, bấm **Chọn thư mục project**.
-- **Firefox / Safari** không ghi file trực tiếp được. Bấm Lưu sẽ tải 3 file về, bạn chép đè chúng vào `assets/js/`.
+- **Trước khi ghi**, trang hỏi *"Lưu trực tiếp vào thư mục project?"* và hiện file sẽ ghi. Bấm OK để lưu.
+- **Thư mục được nhớ lại theo từng project**. Lần sau chỉ cần xác nhận; khi mở lại trình duyệt, Chrome có thể hỏi lại quyền một lần. Muốn đổi thư mục, bấm **Chọn thư mục project**.
+- **Chỉ nhận đúng thư mục của project** chứa trang Setting đang mở (so theo tên thư mục), để Setting của project này không ghi nhầm sang project khác. Đổi tên thư mục project thì chọn lại thư mục.
+- **Lưu lỗi**: trang hiện hộp thông báo lỗi; khi đó cả 2 thiệp giữ nguyên bản cũ (không có chuyện thiệp này đổi, thiệp kia không).
+- **Firefox / Safari** không ghi file trực tiếp được. Bấm Lưu sẽ tải `config-setting.js` về, bạn chép đè vào `assets/js/`.
 
 ### Các phần trong Setting
 
@@ -82,8 +85,8 @@ Mỗi phần có checkbox **Hiển thị phần này**, áp dụng cho cả 2 th
 
 **Cập nhật code mới cho một bản copy cũ** (giữ nguyên nội dung thiệp của bản copy):
 
-1. Chép code mới đè lên bản copy, **trừ** 3 file `assets/js/config-*.js` và các ảnh/nhạc của bản copy.
-2. Mở `Setting/index.html` của bản copy, bấm **Lưu** để tạo lại 2 file thiệp theo code mới.
+1. Chép code mới đè lên bản copy, **trừ** file `assets/js/config-setting.js` và các ảnh/nhạc của bản copy.
+2. Mở `Setting/index.html` của bản copy, kiểm tra rồi bấm **Lưu** (để bổ sung trường mới vào dữ liệu nếu có).
 
 Nếu lỡ ghi đè `config-setting.js`, dùng **Nhập dữ liệu…** với file `config-setting.js` cũ (lấy từ git hoặc bản sao lưu) rồi bấm Lưu.
 
@@ -94,7 +97,7 @@ Bỏ chọn **Bật thiệp của nhà này** trong phần Nhà trai & nhà gái
 - Link thiệp nhà đó (`Groom/` hoặc `Bride/`) chỉ hiện *"Thiệp chưa sẵn sàng"*; file `config-<nhà>.js` không còn dữ liệu.
 - Trang chọn thiệp ẩn thiệp đó. Chỉ còn 1 thiệp thì tự chuyển thẳng tới thiệp còn lại.
 - Thiệp nhà còn lại ẩn mọi thông tin của nhà đã tắt (lễ, địa chỉ, bản đồ).
-- Thông tin nhà đã tắt vẫn nằm trong `config-setting.js` trên máy/trong git, nhưng **không được publish**: bản deploy không có `config-setting.js`, trang Setting và ảnh bản đồ của nhà đã tắt. Lưu ý repo GitHub công khai thì ai cũng đọc được file trong repo.
+- Thông tin nhà đã tắt vẫn nằm trong `config-setting.js` trên máy/trong git, nhưng **không được publish**: bản deploy để rỗng `config-setting.js`, không có trang Setting và ảnh bản đồ của nhà đã tắt. Lưu ý repo GitHub công khai thì ai cũng đọc được file trong repo.
 
 ### Chỉ hiện lễ của nhà mình
 
@@ -154,7 +157,7 @@ Project deploy tự động bằng GitHub Actions ([.github/workflows/deploy.yml
 2. Mỗi lần cập nhật: lưu trong Setting, rồi commit và push lên `main`. Workflow sẽ:
    - chạy test code;
    - chạy `node scripts/build-site.js` tạo thư mục `_site`: 2 thiệp được tạo lại theo `config-setting.js`, nên mọi lựa chọn trong Setting (tắt thiệp, chỉ hiện lễ nhà mình...) tự áp dụng, không cần sửa tay file nào;
-   - deploy `_site` lên GitHub Pages. `_site` **không có** `config-setting.js`, trang `Setting/`, `tests/`, `scripts/` và ảnh bản đồ của nhà đã tắt thiệp.
+   - deploy `_site` lên GitHub Pages. `_site` có `config-setting.js` rỗng (không chứa dữ liệu) và **không có** trang `Setting/`, `tests/`, `scripts/` và ảnh bản đồ của nhà đã tắt thiệp.
 
    Muốn xem trước đúng bản sẽ deploy: `node scripts/build-site.js` rồi mở `_site/index.html`.
 

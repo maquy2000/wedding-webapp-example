@@ -1,12 +1,12 @@
 // Dữ liệu gốc của trang Setting. Khi bấm Lưu, config-groom.js và config-bride.js được tạo lại từ file này.
 window.WEDDING_SETTING = {
   "couple": {
-    "groomName": "Công Duy",
-    "brideName": "Nguyệt Quỳnh"
+    "groomName": "Mạnh Quyết",
+    "brideName": "Adu Vl Luon"
   },
   "music": {
     "enabled": true,
-    "src": "assets/audio/Photograph-1.mp3"
+    "src": "assets/audio/Bruno Mars - Marry You (Official Lyric Video).mp3"
   },
   "text": {
     "coverEyebrow": "Wedding Invitation",
@@ -27,11 +27,11 @@ window.WEDDING_SETTING = {
     "thanksMessage": "Sự hiện diện của bạn là niềm vui và vinh hạnh cho gia đình chúng tôi."
   },
   "images": {
-    "cover": "assets/images/bg2.png",
+    "cover": "assets/images/background1.svg",
     "couple": "assets/images/main.jpg",
     "gift": "assets/images/d3.svg",
-    "background": "assets/images/bg2.png",
-    "wave": "assets/images/wave2.png"
+    "background": "assets/images/background1.svg",
+    "wave": "assets/images/section-wave.svg"
   },
   "ui": {
     "autoScroll": true,
@@ -60,26 +60,11 @@ window.WEDDING_SETTING = {
     {
       "src": "assets/images/2aobor8ramrc68qys8iadfk2aron9iax58kepdce6-1.jpg",
       "alt": "Ảnh album 2",
-      "orientation": "portrait"
+      "orientation": "landscape"
     },
     {
       "src": "assets/images/2aobor8ramsvzka7gww0fecqaiy3yvjhvjfj6uj23-1.jpg",
       "alt": "Ảnh album 3",
-      "orientation": "portrait"
-    },
-    {
-      "src": "assets/images/2aobor8ramsvzka7gww0fesypwgzrl2cx3md6am42-1.jpg",
-      "alt": "Ảnh album 4",
-      "orientation": "portrait"
-    },
-    {
-      "src": "assets/images/2aobor8ramsvzka7gww0fezmzch0fpb8plyd6j2u4-1.jpg",
-      "alt": "Ảnh album 5",
-      "orientation": "portrait"
-    },
-    {
-      "src": "assets/images/2aobor8ramyha6zqg305lcw8ub8llrwjaiyevipc5-1.jpg",
-      "alt": "Ảnh album 6",
       "orientation": "portrait"
     }
   ],
@@ -91,48 +76,48 @@ window.WEDDING_SETTING = {
   "families": {
     "groom": {
       "enabled": true,
-      "showOtherFamily": false,
+      "showOtherFamily": true,
       "label": "Nhà trai",
       "invitationTitle": "Tiệc cưới tại nhà trai",
       "dates": {
-        "weddingDate": "2026-12-12T00:00:00+07:00",
-        "coverDate": "Thứ 7, 12 tháng 12, 2026",
-        "displayDate": "12.12.2026"
+        "weddingDate": "2026-12-19T00:00:00+07:00",
+        "coverDate": "Thứ 7, 19 tháng 12, 2026",
+        "displayDate": "19.12.2026"
       },
       "reception": {
         "title": "Tiệc cưới - Nhà trai",
-        "time": "17:00, 12/12/2026"
+        "time": "17:00, 19/12/2026"
       },
       "ceremony": {
         "title": "Lễ tân hôn - Nhà trai",
-        "time": "10:00, 13/12/2026"
+        "time": "11:00, 20/12/2026"
       },
-      "address": "Tổ dân phố Hùng Thắng, Phường Trần Lãm, Tỉnh Hưng Yên",
-      "mapUrl": "https://www.google.com/maps/place/M%C5%A9+C%E1%BB%91i+%C4%90%C3%B4ng+L%C3%A0o/@20.4240876,106.3382002,937m/data=!3m2!1e3!4b1!4m6!3m5!1s0x3135e5002a68c54b:0x153ea992a68c7603!8m2!3d20.4240876!4d106.3382002!16s%2Fg%2F11wwsc0szl?entry=ttu&g_ep=EgoyMDI2MTAyNy4wIKXMDSoASAFQAw%3D%3D",
-      "image": "assets/images/groom.png",
+      "address": "Tổ dân phố Vũ Chính, Phường Trần Lãm, Tỉnh Hưng Yên",
+      "mapUrl": "https://www.google.com/maps/place/20%C2%B025'21.9%22N+106%C2%B020'01.0%22E/@20.4227647,106.333626,400m/data=!3m1!1e3!4m4!3m3!8m2!3d20.42275!4d106.3336111?entry=ttu&g_ep=EgoyMDI2MTEwMy4wIKXMDSoASAFQAw%3D%3D",
+      "image": "assets/images/map_groom.png",
       "imageAlt": "Bản đồ nhà trai"
     },
     "bride": {
       "enabled": true,
-      "showOtherFamily": false,
+      "showOtherFamily": true,
       "label": "Nhà gái",
       "invitationTitle": "Tiệc cưới tại nhà gái",
       "dates": {
-        "weddingDate": "2026-11-14T00:00:00+07:00",
-        "coverDate": "Thứ 7, 14 tháng 11, 2026",
-        "displayDate": "14.11.2026"
+        "weddingDate": "2026-12-19T00:00:00+07:00",
+        "coverDate": "Thứ 7, 19 tháng 12, 2026",
+        "displayDate": "19.12.2026"
       },
       "reception": {
         "title": "Tiệc cưới - Nhà gái",
-        "time": "11:30, 14/11/2026"
+        "time": "16:00, 19/12/2026"
       },
       "ceremony": {
         "title": "Lễ vu quy - Nhà gái",
-        "time": "08:00, 14/11/2026"
+        "time": "08:00, 20/12/2026"
       },
-      "address": "Số 192 Ngô Gia Tự, Phường Phú Yên, Tỉnh Đắk Lắk",
-      "mapUrl": "https://www.google.com/maps/place/192+Ng%C3%B4+Gia+T%E1%BB%B1,+Ph%C3%BA+Y%C3%AAn,+%C4%90%E1%BA%AFk+L%E1%BA%AFk,+Vi%E1%BB%87t+Nam/@13.0637299,109.325023,974m/data=!3m2!1e3!4b1!4m6!3m5!1s0x316fee86d8c124d3:0x2465adcc2f50c75a!8m2!3d13.0637299!4d109.3275979!16s%2Fg%2F11f57qgzn2?entry=ttu&g_ep=EgoyMDI2MTAyNy4wIKXMDSoASAFQAw%3D%3D",
-      "image": "assets/images/bride.png",
+      "address": "Nơi anh thấy em đẹp nhất =))))))))))",
+      "mapUrl": "https://www.google.com/maps",
+      "image": "assets/images/map_groom.png",
       "imageAlt": "Bản đồ nhà gái"
     }
   }
